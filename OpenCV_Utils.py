@@ -418,7 +418,7 @@ def drawHoughLinesP(image, lines):
             cv2.line(result, (x1, y1), (x2, y2), (0, 0, 255), 3)
     return result
 
-
+# modify
 def splitTwoSideLines(lines, slope_threshold = (5. * np.pi / 180.)):
     lefts = []
     rights = []
@@ -428,7 +428,12 @@ def splitTwoSideLines(lines, slope_threshold = (5. * np.pi / 180.)):
         x2 = line[0,2]
         y2 = line[0,3]
         if (x2-x1) == 0:
-            continue
+            x2 = x2 + 1
+        #   continue
+        if (y2-y1) == 0:
+            y2 = y2 + 1
+        # if (x2-x1) == 0:
+        #     continue
         slope = (float)(y2-y1)/(float)(x2-x1)
         if abs(slope) < slope_threshold:
             continue
@@ -436,7 +441,52 @@ def splitTwoSideLines(lines, slope_threshold = (5. * np.pi / 180.)):
             lefts.append([slope, x1, y1, x2, y2])
         else:
             rights.append([slope, x1, y1, x2, y2])
+            print("rights")
     return lefts, rights
+
+# x1-x2  
+def centerLinePts(lines, slope_threshold = (5. * np.pi / 180.)):
+    lefts = []
+    rights = []
+    centers = []
+    for line in lines:
+        x1 = line[0,0]
+        y1 = line[0,1]
+        x2 = line[0,2]
+        y2 = line[0,3]
+
+        if (x2-x1) == 0:
+            x2 = x2 + 1
+        #   continue
+        if (y2-y1) == 0:
+            y2 = y2 + 1
+        slope = (float)(y2-y1)/(float)(x2-x1)
+        if abs(slope) < slope_threshold:
+            continue
+        if slope <= 0:
+            y1, y2 = y2, y1
+            x1, x2 = x2, x1
+            lefts.append([slope, x1, y1, x2, y2])
+            print("lefts", lefts)
+        else:
+            rights.append([slope, x1, y1, x2, y2])
+            print("rights", rights)
+    
+    #print(lefts[0][1])
+    #a1 = lefts[0][1]
+    #b1 = rights[0][1]
+    #print(type(a1))
+    #cx1 = int( (a1 + b1) / 2)
+    #print("cx1", cx1)
+    cx1 = (lefts[0][1] + rights[0][1]) / 2
+    cy1 = (lefts[0][2] + rights[0][2]) / 2
+    cx2 = (lefts[0][3] + rights[0][3]) / 2
+    cy2 = (lefts[0][4] + rights[0][4]) / 2
+
+    cSlope = (float)(cy2-cy1)/(float)(cx2-cx1)
+    centers.append([cSlope, cx1, cy1, cx2, cy2])
+    
+    return centers
 
 
 def splitOneSideLines(lines, slope_threshold = (5. * np.pi / 180.)):
@@ -497,6 +547,64 @@ def lineFitting(image, lines, color = (0,0,255), thickness = 3, slope_threshold 
         max_x_right = interpolate(right[1], right[2], right[3], right[4], max_y)
         cv2.line(result, (min_x_right, min_y), (max_x_right, max_y), color, thickness)
     return result
+
+#center line 
+def centerLineFitting(image, lines, color = (0,0,255), thickness = 3, slope_threshold = (5. * np.pi / 180.)):
+    result = imageCopy(image)
+    height = image.shape[0]
+    #lefts, rights = splitTwoSideLines(lines, slope_threshold)
+    centers = centerLinePts(lines, slope_threshold)
+    #print(lefts)
+    #print(rights)
+    center = medianPoint(centers) 
+    #left = medianPoint(lefts)
+    #right = medianPoint(rights)
+    min_y = int(height*0.6)
+    max_y = height
+
+    if center is not None:
+        min_x_center = interpolate(center[1], center[2], center[3], center[4], min_y)
+        max_x_center = interpolate(center[1], center[2], center[3], center[4], max_y)
+        cv2.line(result, (min_x_center, min_y), (max_x_center, max_y), color, thickness)
+    # if left is not None:
+    #     min_x_left = interpolate(left[1], left[2], left[3], left[4], min_y)
+    #     max_x_left = interpolate(left[1], left[2], left[3], left[4], max_y)
+    #     cv2.line(result, (min_x_left, min_y), (max_x_left, max_y), color, thickness)
+    # if right is not None:
+    #     min_x_right = interpolate(right[1], right[2], right[3], right[4], min_y)
+    #     max_x_right = interpolate(right[1], right[2], right[3], right[4], max_y)
+    #     cv2.line(result, (min_x_right, min_y), (max_x_right, max_y), color, thickness)
+    return result
+
+def centerPoints(image, lines, color = (0,0,255), thickness = 3, slope_threshold = (5. * np.pi / 180.)):
+    result = imageCopy(image)
+    height = image.shape[0]
+    ctp = []
+    #lefts, rights = splitTwoSideLines(lines, slope_threshold)
+    centers = centerLinePts(lines, slope_threshold)
+    #print(lefts)
+    #print(rights)
+    center = medianPoint(centers) 
+    #left = medianPoint(lefts)
+    #right = medianPoint(rights)
+    min_y = int(height*0.6)
+    max_y = height
+
+    if center is not None:
+        min_x_center = interpolate(center[1], center[2], center[3], center[4], min_y)
+        max_x_center = interpolate(center[1], center[2], center[3], center[4], max_y)
+        cv2.line(result, (min_x_center, min_y), (max_x_center, max_y), color, thickness)
+    ctp.append([min_x_center, min_y])
+    ctp.append([min_x_center, max_y])
+    # if left is not None:
+    #     min_x_left = interpolate(left[1], left[2], left[3], left[4], min_y)
+    #     max_x_left = interpolate(left[1], left[2], left[3], left[4], max_y)
+    #     cv2.line(result, (min_x_left, min_y), (max_x_left, max_y), color, thickness)
+    # if right is not None:
+    #     min_x_right = interpolate(right[1], right[2], right[3], right[4], min_y)
+    #     max_x_right = interpolate(right[1], right[2], right[3], right[4], max_y)
+    #     cv2.line(result, (min_x_right, min_y), (max_x_right, max_y), color, thickness)
+    return ctp
 
 
 def houghCircles(image, method=cv2.HOUGH_GRADIENT, dp = 1, minDist = 10, canny = 50, threshold = 30, minRadius = 0, maxRadius = 0):
