@@ -441,7 +441,6 @@ def splitTwoSideLines(lines, slope_threshold = (5. * np.pi / 180.)):
             lefts.append([slope, x1, y1, x2, y2])
         else:
             rights.append([slope, x1, y1, x2, y2])
-            print("rights")
     return lefts, rights
 
 # x1-x2  
@@ -454,7 +453,6 @@ def centerLinePts(lines, slope_threshold = (5. * np.pi / 180.)):
         y1 = line[0,1]
         x2 = line[0,2]
         y2 = line[0,3]
-
         if (x2-x1) == 0:
             x2 = x2 + 1
         #   continue
@@ -464,20 +462,18 @@ def centerLinePts(lines, slope_threshold = (5. * np.pi / 180.)):
         if abs(slope) < slope_threshold:
             continue
         if slope <= 0:
-            y1, y2 = y2, y1
-            x1, x2 = x2, x1
             lefts.append([slope, x1, y1, x2, y2])
-            print("lefts", lefts)
         else:
             rights.append([slope, x1, y1, x2, y2])
-            print("rights", rights)
-    
-    #print(lefts[0][1])
-    #a1 = lefts[0][1]
-    #b1 = rights[0][1]
-    #print(type(a1))
-    #cx1 = int( (a1 + b1) / 2)
-    #print("cx1", cx1)
+
+    if lefts[0][2] > lefts[0][4]:
+        lefts[0][1], lefts[0][2], lefts[0][3], lefts[0][4] = lefts[0][3], lefts[0][4], lefts[0][1], lefts[0][2]
+    if rights[0][2] > rights[0][4]:
+        rights[0][1], rights[0][2], rights[0][3], rights[0][4] = rights[0][3], rights[0][4], rights[0][1], rights[0][2]
+
+    #print("lefts", lefts)
+    #print("rights", rights)
+
     cx1 = (lefts[0][1] + rights[0][1]) / 2
     cy1 = (lefts[0][2] + rights[0][2]) / 2
     cx2 = (lefts[0][3] + rights[0][3]) / 2
