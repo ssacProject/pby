@@ -448,6 +448,11 @@ def centerLinePts(lines, slope_threshold = (5. * np.pi / 180.)):
     lefts = []
     rights = []
     centers = []
+    print("lines\n", lines)
+    
+    if lines is None:
+        print("lines is None\n")
+        return 
     for line in lines:
         x1 = line[0,0]
         y1 = line[0,1]
@@ -465,12 +470,18 @@ def centerLinePts(lines, slope_threshold = (5. * np.pi / 180.)):
             lefts.append([slope, x1, y1, x2, y2])
         else:
             rights.append([slope, x1, y1, x2, y2])
-
-    if lefts[0][2] > lefts[0][4]:
-        lefts[0][1], lefts[0][2], lefts[0][3], lefts[0][4] = lefts[0][3], lefts[0][4], lefts[0][1], lefts[0][2]
-    if rights[0][2] > rights[0][4]:
-        rights[0][1], rights[0][2], rights[0][3], rights[0][4] = rights[0][3], rights[0][4], rights[0][1], rights[0][2]
-
+    if lefts is not None:
+        if lefts[0][2] > lefts[0][4]:
+            lefts[0][1], lefts[0][2], lefts[0][3], lefts[0][4] = lefts[0][3], lefts[0][4], lefts[0][1], lefts[0][2]
+    else:
+        print("lefts is None\n")
+    
+    if rights is not None:
+        if rights[0][2] > rights[0][4]:
+            rights[0][1], rights[0][2], rights[0][3], rights[0][4] = rights[0][3], rights[0][4], rights[0][1], rights[0][2]
+    else:
+        print("rights is None\n")
+        
     #print("lefts", lefts)
     #print("rights", rights)
 
