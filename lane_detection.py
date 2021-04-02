@@ -5,6 +5,18 @@ def dist(P, A, B):
     AB = ( (A[0] - B[0]) ** 2 + (A[1] - B[1]) ** 2 ) ** 0.5
     return ( area / AB )
 
+def centerAim(image):
+
+    height, width = image.shape[:2]
+    line_horizontal_start = ( int(width * 0.45), int(height *0.6))
+    line_horizontal_end = (int(width * 0.55), int(height *0.6))
+    line_vertical_height = ( int(width * 0.5), int(height *0.55))
+    line_vertical_width = (int(width * 0.5), int(height *0.65))
+
+    image_Aim = cv2.line(image, line_horizontal_start, line_horizontal_end, (255, 0, 0), 3)
+    image_Aim = cv2.line(image, line_vertical_height, line_vertical_width, (255, 0, 0), 3)
+    return image_Aim
+
 def LaneDetectImg(imagePath):
     #image = cv2.imread(imagePath) 
     image = imagePath
@@ -21,22 +33,11 @@ def LaneDetectImg(imagePath):
     
     cpt = (int(width*0.5), int(height*0.5)) 
     
-    #pt1i = (int(width*0.45), int(height*0.35))
-    #pt2i = (int(width*0.55), int(height*0.35))
-    #pt3i = (int(width*0.8), int(height*1.0))
-    #pt4i = (int(width*0.2), int(height*1.0))
-    
     #image_edge1 = image_edge
     #image_edge1 = cv2.line(image_edge1, pt1i, pt4i, (255, 255, 255), 5)
     #print(image_edge1)
     #image_edge1 = cv2.line(image_edge1, pt2i, pt3i, (255, 255, 255), 5)
     #imageShow("image_edge1", image_edge)
-    
-    
-    line_horizontal_start = ( int(width * 0.45), int(height *0.6))
-    line_horizontal_end = (int(width * 0.55), int(height *0.6))
-    line_vertical_height = ( int(width * 0.5), int(height *0.55))
-    line_vertical_width = (int(width * 0.5), int(height *0.65))
     
     roi_corners = np.array([[pt1, pt2, pt3, pt4]], dtype=np.int32)
     
@@ -57,9 +58,7 @@ def LaneDetectImg(imagePath):
     print("distance")
     print(ptLen)
     
-    #image_lane2 = centerLine(image, lines, (0, 0, 255), 3, 5. * np.pi / 180.)
-    image_lane = cv2.line(image_lane, line_horizontal_start, line_horizontal_end, (255, 0, 0), 3)
-    image_lane = cv2.line(image_lane, line_vertical_height, line_vertical_width, (255, 0, 0), 3)
+    image_lane = centerAim(image_lane)
     
     
     #image_line = cv2.line(image_lane, pt1i, pt4i, (0, 255, 0), 5)

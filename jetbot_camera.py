@@ -37,6 +37,7 @@ def Video(openpath):
                 lane_detect = lane_detection.LaneDetectImg(frame)
                 cv2.imshow("input", lane_detect)
             except:
+                frame = lane_detect.centerAim(frame)
                 cv2.imshow("input", frame)
             #lane_detect = lineFitting(frame)
             # Display the resulting frame
