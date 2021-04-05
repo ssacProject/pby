@@ -128,6 +128,7 @@ def fillPolyROI(image, points):
 
 
 def polyROI(image, points):
+    
     mask = fillPolyROI(image, points)
     return cv2.bitwise_and(image, mask)
 
@@ -444,12 +445,13 @@ def splitTwoSideLines(lines, slope_threshold = (5. * np.pi / 180.)):
     return lefts, rights
 
 # x1-x2  
-def centerLinePts(lines, slope_threshold = (5. * np.pi / 180.)):
+def centerLinePts(lines, cpt, slope_threshold = (5. * np.pi / 180.)):
     lefts = []
     rights = []
     centers = []
+    all_lines = []
     print("lines\n", lines)
-    
+    #cpt (width, height)
     if lines is None:
         print("lines is None\n")
         return 
@@ -461,19 +463,31 @@ def centerLinePts(lines, slope_threshold = (5. * np.pi / 180.)):
         if (x2-x1) == 0:
             x2 = x2 + 1
         #   continue
-        if (y2-y1) == 0:
-            y2 = y2 + 1
+        #if (y2-y1) == 0:
+        #    y2 = y2 + 1
         slope = (float)(y2-y1)/(float)(x2-x1)
-        if abs(slope) < slope_threshold:
-            continue
-        if slope <= 0:
-            if slope is None:
-                slope = 0
-            lefts.append([slope, x1, y1, x2, y2])
-        else:
-            if slope is None:
-                slope = 0
-            rights.append([slope, x1, y1, x2, y2])
+    
+        all_lines.append([0, x1, y1, x2, y2])
+        #print("all_lines", all_lines)    
+        
+    inter_list = []
+    count = 0
+    for i in all_lines:
+        #print("forfor I", i)
+        #print("cpt(1)", cpt[0], all_lines[0][0])
+        inter_x = interpolate(all_lines[count][1], all_lines[count][2], all_lines[count][3], all_lines[count][4], cpt[1])
+        count = count + 1
+        #print("inter_x",inter_x)
+        inter_list.append(inter_x)
+        #print("inter_list", inter_list)
+
+    lefts.append(all_lines[inter_list.index(min(inter_list))])
+    rights.append(all_lines[inter_list.index(max(inter_list))])
+    print("lefts", lefts)
+    print("rights", rights)
+
+            
+    print("\n\n")
     if lefts is not None:
         if lefts[0][2] > lefts[0][4]:
             lefts[0][1], lefts[0][2], lefts[0][3], lefts[0][4] = lefts[0][3], lefts[0][4], lefts[0][1], lefts[0][2]
@@ -486,17 +500,20 @@ def centerLinePts(lines, slope_threshold = (5. * np.pi / 180.)):
     else:
         print("rights is None\n\n\n\n")
         
-    #print("lefts", lefts)
-    #print("rights", rights)
+    print("lefts\n", lefts)
+    print("rights\n", rights)
 
     cx1 = (lefts[0][1] + rights[0][1]) / 2
     cy1 = (lefts[0][2] + rights[0][2]) / 2
     cx2 = (lefts[0][3] + rights[0][3]) / 2
     cy2 = (lefts[0][4] + rights[0][4]) / 2
 
-    cSlope = (float)(cy2-cy1)/(float)(cx2-cx1)
-    centers.append([cSlope, cx1, cy1, cx2, cy2])
-    
+    if (float)(cx2-cx1) == 0:
+        cSlope = 0
+    else:
+        cSlope = (float)(cy2-cy1)/(float)(cx2-cx1)
+        centers.append([cSlope, cx1, cy1, cx2, cy2])
+    print("centers finish")
     return centers
 
 
@@ -564,10 +581,15 @@ def centerLineFitting(image, lines, color = (0,0,255), thickness = 3, slope_thre
     result = imageCopy(image)
     height = image.shape[0]
     #lefts, rights = splitTwoSideLines(lines, slope_threshold)
-    centers = centerLinePts(lines, slope_threshold)
+    print("cpt up")
+    cpt = cptF(image)
+    print("cpt down")
+    centers = centerLinePts(lines, cpt, slope_threshold)
+    print("111")
     #print(lefts)
     #print(rights)
     center = medianPoint(centers) 
+    print("222")
     #left = medianPoint(lefts)
     #right = medianPoint(rights)
     min_y = int(height*0.6)
@@ -585,14 +607,23 @@ def centerLineFitting(image, lines, color = (0,0,255), thickness = 3, slope_thre
     #     min_x_right = interpolate(right[1], right[2], right[3], right[4], min_y)
     #     max_x_right = interpolate(right[1], right[2], right[3], right[4], max_y)
     #     cv2.line(result, (min_x_right, min_y), (max_x_right, max_y), color, thickness)
+    print("centerLineFitting finish")
     return result
 
-def centerPoints(image, lines, color = (0,0,255), thickness = 3, slope_threshold = (5. * np.pi / 180.)):
+def cptF(image):
+    height, width = image.shape[:2]
+    cpt = (int(width*0.5), int(height*0.5))
+
+    return cpt
+
+def centerPoints(image, lines, color = (0,0,255), thickness = 3):
     result = imageCopy(image)
     height = image.shape[0]
-    ctp = []
+    ctp = []            # point of center Red Line
+    cpt = cptF(image)  # point of aim
+    
     #lefts, rights = splitTwoSideLines(lines, slope_threshold)
-    centers = centerLinePts(lines, slope_threshold)
+    centers = centerLinePts_point(lines, cpt)
     #print(lefts)
     #print(rights)
     center = medianPoint(centers) 
@@ -605,8 +636,11 @@ def centerPoints(image, lines, color = (0,0,255), thickness = 3, slope_threshold
         min_x_center = interpolate(center[1], center[2], center[3], center[4], min_y)
         max_x_center = interpolate(center[1], center[2], center[3], center[4], max_y)
         cv2.line(result, (min_x_center, min_y), (max_x_center, max_y), color, thickness)
-    ctp.append([min_x_center, min_y])
-    ctp.append([min_x_center, max_y])
+        ctp.append([min_x_center, min_y])
+        ctp.append([max_x_center, max_y])
+    else:
+        print("Open_Util, centerPoints, center is None!! \n")
+        return -1
     # if left is not None:
     #     min_x_left = interpolate(left[1], left[2], left[3], left[4], min_y)
     #     max_x_left = interpolate(left[1], left[2], left[3], left[4], max_y)
@@ -631,3 +665,68 @@ def drawHoughCircles(image, circles):
         cv2.circle(result, (i[0],i[1]), int(i[2]), (0, 255, 0), 2)
         cv2.circle(result, (i[0],i[1]), 2, (0, 0, 255), -1)
     return result
+
+def centerLinePts_point(lines, cpt):
+    lefts = []
+    rights = []
+    centers = []
+    all_lines = []
+    #cpt (width, height)
+    if lines is None:
+        print("lines is None\n")
+        return 
+    for line in lines:
+        x1 = line[0,0]
+        y1 = line[0,1]
+        x2 = line[0,2]
+        y2 = line[0,3]
+        if (x2-x1) == 0:
+            x2 = x2 + 1
+        #   continue
+        #if (y2-y1) == 0:
+        #    y2 = y2 + 1
+        slope = (float)(y2-y1)/(float)(x2-x1)
+    
+        all_lines.append([0, x1, y1, x2, y2])
+        #print("all_lines", all_lines)    
+        
+    inter_list = []
+    count = 0
+    for i in all_lines:
+        #print("forfor I", i)
+        #print("cpt(1)", cpt[0], all_lines[0][0])
+        inter_x = interpolate(all_lines[count][1], all_lines[count][2], all_lines[count][3], all_lines[count][4], cpt[1])
+        count = count + 1
+        #print("inter_x",inter_x)
+        inter_list.append(inter_x)
+        #print("inter_list", inter_list)
+
+    lefts.append(all_lines[inter_list.index(min(inter_list))])
+    rights.append(all_lines[inter_list.index(max(inter_list))])
+            
+    if lefts is not None:
+        if lefts[0][2] > lefts[0][4]:
+            lefts[0][1], lefts[0][2], lefts[0][3], lefts[0][4] = lefts[0][3], lefts[0][4], lefts[0][1], lefts[0][2]
+    else:
+        print("lefts is None\n\n\n\n")
+    
+    if rights is not None:
+        if rights[0][2] > rights[0][4]:
+            rights[0][1], rights[0][2], rights[0][3], rights[0][4] = rights[0][3], rights[0][4], rights[0][1], rights[0][2]
+    else:
+        print("rights is None\n\n\n\n")
+        
+    cx1 = (lefts[0][1] + rights[0][1]) / 2
+    cy1 = (lefts[0][2] + rights[0][2]) / 2
+    cx2 = (lefts[0][3] + rights[0][3]) / 2
+    cy2 = (lefts[0][4] + rights[0][4]) / 2
+
+    if (float)(cx2-cx1) == 0:
+        cSlope = 0
+    else:
+        cSlope = (float)(cy2-cy1)/(float)(cx2-cx1)
+        centers.append([cSlope, cx1, cy1, cx2, cy2])
+    return centers
+
+
+

@@ -33,11 +33,22 @@ def Video(openpath):
             #height, width = frame.shape[:2]
             #line_horizontal_start, line_horizontal_end = (int(width* 0.45), int(height*0.6)), (int(width * 0.55), int(height * 0.6))
             #linecv = cv2.line(frame, line_horizontal_start, line_horizontal_end, (255,0,0),3)
+            #lane_detect = hough(frame)
+            #cv2.imshow("input", lane_detect)
+#            lane_detect = lane_detection.LaneDetectImg(frame)
+                #lane_detect = lane_detection.hough(frame)
+            #cv2.imshow("input", lane_detect)
+            
             try:
+                #canny
+                #canny_edge = lane_detection.LaneDetectImg_canny(frame)
+                #cv2.imshow("canny", canny_edge)
                 lane_detect = lane_detection.LaneDetectImg(frame)
+                #lane_detect = lane_detection.hough(frame)
                 cv2.imshow("input", lane_detect)
+                #cv2.waitKey(0)
             except:
-                frame = lane_detect.centerAim(frame)
+                frame = lane_detection.centerAim(frame)
                 cv2.imshow("input", frame)
             #lane_detect = lineFitting(frame)
             # Display the resulting frame
@@ -48,6 +59,7 @@ def Video(openpath):
             break
         # waitKey(int(1000.0/fps)) for matching fps of video
         if cv2.waitKey(int(1000.0/fps)) & 0xFF == ord('q'):
+            #motor_stop()
             break
     # When everything done, release the capture
     cap.release()
