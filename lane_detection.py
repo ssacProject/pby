@@ -16,7 +16,6 @@ def distSign(cpt, center_min, center_max, ptLen):
     return ptLen
 
 def centerAim(image):
-
     height, width = image.shape[:2]
     line_horizontal_start = ( int(width * 0.45), int(height *0.6))
     line_horizontal_end = (int(width * 0.55), int(height *0.6))
@@ -89,7 +88,8 @@ def LaneDetectImg(imagePath):
         print(distance)
 
         if motorDef.motor_run(distance) == -1:
-            print("distance is none")
+            print("distance is none all_stop")
+            motorDef.all_stop()
         print("motor OK")
     
     image_lane = centerAim(image_lane)
