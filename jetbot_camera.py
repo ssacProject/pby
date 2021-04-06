@@ -36,7 +36,7 @@ def Video(openpath):
             #linecv = cv2.line(frame, line_horizontal_start, line_horizontal_end, (255,0,0),3)
             #lane_detect = hough(frame)
             #cv2.imshow("input", lane_detect)
-            lane_detect = lane_detection.LaneDetectImg(frame)
+#            lane_detect = lane_detection.LaneDetectImg(frame)
                 #lane_detect = lane_detection.hough(frame)
             #cv2.imshow("input", lane_detect)
             
@@ -44,8 +44,8 @@ def Video(openpath):
                 #canny
                 #canny_edge = lane_detection.LaneDetectImg_canny(frame)
                 #cv2.imshow("canny", canny_edge)
+                
                 lane_detect = lane_detection.LaneDetectImg(frame)
-                #lane_detect = lane_detection.hough(frame)
                 cv2.imshow("input", lane_detect)
                 #cv2.waitKey(0)
             except:

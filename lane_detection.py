@@ -58,9 +58,21 @@ def LaneDetectImg(imagePath):
     #'''
     #print("houghLinesP", lines) #line check
     #image_lane = lineFitting(image, lines, (0, 0, 255), 3, 5. * np.pi / 180.)
+    #centerPt = centerPoints(image, lines, (0, 0, 255), 2)
+    
     centerPt = centerPoints(image, lines, (0, 0, 255), 2)
-    image_lane = centerLineFitting(image, lines, (0, 0, 255), 2, 5. *  np.pi / 180.)
-    #image_lane = lineFittingOneSide(image, lines, (0, 0, 255), 2, np.pi / 180.)
+    if centerPt == 1 :
+        motorDef.all_stop()
+        print("centerPoints is None")
+    #try:
+        #centerPt = centerPoints(image, lines, (0, 0, 255), 2)
+    image_lane = centerLineFitting(image, lines, (0, 0, 255), 2)
+    # except:
+    #     if image_lane == 1:
+    #         print("all_stop()")
+    #         motorDef.all_stop()
+    #         print("image_lane")
+    #         return 1
 
     if centerPt == -1: 
         print("point of center Line not exist")

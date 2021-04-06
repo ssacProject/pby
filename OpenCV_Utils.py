@@ -90,9 +90,66 @@ def drawHoughLinesP(image, lines):
         for x1, y1, x2, y2 in lines[i]:
             cv2.line(result, (x1, y1), (x2, y2), (0, 0, 255), 3)
     return result
-
+####################################################
 # x1-x2  
-def centerLinePts(lines, cpt, slope_threshold = (5. * np.pi / 180.)):
+
+
+def medianPoint(x):
+    if len(x) == 0:
+        return None
+    else:
+        xx = sorted(x)
+        return xx[(int)(len(xx)/2)]
+
+
+def interpolate(x1, y1, x2, y2, y):
+    return int(float(y - y1) * float(x2-x1) / float(y2-y1) + x1)
+
+#center line 
+def centerLineFitting(image, lines, color = (0,0,255), thickness = 3):
+    result = imageCopy(image)
+    height = image.shape[0]
+    #lefts, rights = splitTwoSideLines(lines, slope_threshold)
+
+    cpt = cptF(image)
+
+    try:
+        centers = centerLinePts(lines, cpt)
+    except:
+        print("centers", centers)
+    
+    #print(lefts)
+    #print(rights)
+    if centers is None:
+        print("centers is None")
+        return 1 
+    center = medianPoint(centers) 
+    #left = medianPoint(lefts)
+    #right = medianPoint(rights)
+    min_y = int(height*0.6)
+    max_y = height
+
+    if center is not None:
+        min_x_center = interpolate(center[1], center[2], center[3], center[4], min_y)
+        max_x_center = interpolate(center[1], center[2], center[3], center[4], max_y)
+        cv2.line(result, (min_x_center, min_y), (max_x_center, max_y), color, thickness)
+    # if left is not None:
+    #     min_x_left = interpolate(left[1], left[2], left[3], left[4], min_y)
+    #     max_x_left = interpolate(left[1], left[2], left[3], left[4], max_y)
+    #     cv2.line(result, (min_x_left, min_y), (max_x_left, max_y), color, thickness)
+    # if right is not None:
+    #     min_x_right = interpolate(right[1], right[2], right[3], right[4], min_y)
+    #     max_x_right = interpolate(right[1], right[2], right[3], right[4], max_y)
+    #     cv2.line(result, (min_x_right, min_y), (max_x_right, max_y), color, thickness)
+    print("centerLineFitting finish")
+    return result
+
+def cptF(image):
+    height, width = image.shape[:2]
+    cpt = (int(width*0.5), int(height*0.5))
+    return cpt
+
+def centerLinePts(lines, cpt):
     lefts = []
     rights = []
     centers = []
@@ -101,7 +158,7 @@ def centerLinePts(lines, cpt, slope_threshold = (5. * np.pi / 180.)):
     #cpt (width, height)
     if lines is None:
         print("lines is None\n")
-        return 
+        return 1
     for line in lines:
         x1 = line[0,0]
         y1 = line[0,1]
@@ -161,55 +218,6 @@ def centerLinePts(lines, cpt, slope_threshold = (5. * np.pi / 180.)):
     print("centers finish")
     return centers
 
-def medianPoint(x):
-    if len(x) == 0:
-        return None
-    else:
-        xx = sorted(x)
-        return xx[(int)(len(xx)/2)]
-
-
-def interpolate(x1, y1, x2, y2, y):
-    return int(float(y - y1) * float(x2-x1) / float(y2-y1) + x1)
-
-#center line 
-def centerLineFitting(image, lines, color = (0,0,255), thickness = 3, slope_threshold = (5. * np.pi / 180.)):
-    result = imageCopy(image)
-    height = image.shape[0]
-    #lefts, rights = splitTwoSideLines(lines, slope_threshold)
-
-    cpt = cptF(image)
-
-    centers = centerLinePts(lines, cpt, slope_threshold)
-    #print(lefts)
-    #print(rights)
-    center = medianPoint(centers) 
-    #left = medianPoint(lefts)
-    #right = medianPoint(rights)
-    min_y = int(height*0.6)
-    max_y = height
-
-    if center is not None:
-        min_x_center = interpolate(center[1], center[2], center[3], center[4], min_y)
-        max_x_center = interpolate(center[1], center[2], center[3], center[4], max_y)
-        cv2.line(result, (min_x_center, min_y), (max_x_center, max_y), color, thickness)
-    # if left is not None:
-    #     min_x_left = interpolate(left[1], left[2], left[3], left[4], min_y)
-    #     max_x_left = interpolate(left[1], left[2], left[3], left[4], max_y)
-    #     cv2.line(result, (min_x_left, min_y), (max_x_left, max_y), color, thickness)
-    # if right is not None:
-    #     min_x_right = interpolate(right[1], right[2], right[3], right[4], min_y)
-    #     max_x_right = interpolate(right[1], right[2], right[3], right[4], max_y)
-    #     cv2.line(result, (min_x_right, min_y), (max_x_right, max_y), color, thickness)
-    print("centerLineFitting finish")
-    return result
-
-def cptF(image):
-    height, width = image.shape[:2]
-    cpt = (int(width*0.5), int(height*0.5))
-
-    return cpt
-
 def centerPoints(image, lines, color = (0,0,255), thickness = 3):
     result = imageCopy(image)
     height = image.shape[0]
@@ -217,7 +225,11 @@ def centerPoints(image, lines, color = (0,0,255), thickness = 3):
     cpt = cptF(image)  # point of aim
     
     #lefts, rights = splitTwoSideLines(lines, slope_threshold)
+    
     centers = centerLinePts_point(lines, cpt)
+    print("centers", centers)   
+    if centers == 1:
+        return 1  
     #print(lefts)
     #print(rights)
     center = medianPoint(centers) 
@@ -246,7 +258,7 @@ def centerLinePts_point(lines, cpt):
     #cpt (width, height)
     if lines is None:
         print("lines is None\n")
-        return 
+        return 1 
     for line in lines:
         x1 = line[0,0]
         y1 = line[0,1]
