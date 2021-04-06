@@ -37,17 +37,17 @@ def all_stop():
  
  # go front
 def motor_start():
-    set_speed(motor_left_ID, 0.3)
-    set_speed(motor_right_ID, 0.3)
+    set_speed(motor_left_ID, 0.2)
+    set_speed(motor_right_ID, 0.2)
     
 # go left
 def motor_left_direction():
     set_speed(motor_left_ID, 0.2)
-    set_speed(motor_right_ID, 0.4)
+    set_speed(motor_right_ID, 0.25)
     
 # go right
 def motor_right_direction():
-    set_speed(motor_left_ID, 0.4)
+    set_speed(motor_left_ID, 0.25)
     set_speed(motor_right_ID, 0.2)
     
 # motor init    
@@ -63,6 +63,11 @@ motor_right = motor_driver.getMotor(motor_right_ID)
 set_speed(motor_left_ID,   0.0)
 set_speed(motor_right_ID,  0.0)
 
+time.sleep(0.1)
+
+#set_speed(motor_left_ID, 0.0)
+#set_speed(motor_right_ID, 0.0)
+
 left = 0.0
 right = 0.0
 
@@ -75,9 +80,12 @@ def motor_run(distance):
         motor_start()
         print("front !!")
     elif distance < -25 :
-        motor_right_direction()
+        motor_left_direction()
         print("right !!")
     elif distance > 25 :
-        motor_left_direction()
+        motor_right_direction()
         print("left !!")
+    else :
+        all_stop()
+        print("distance is None")
         
