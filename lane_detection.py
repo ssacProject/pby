@@ -1,4 +1,5 @@
 from OpenCV_Functions import *
+import motorDef
 
 def dist(P, A, B):
     area = abs ( (A[0] - P[0]) * (B[1] - P[1]) - (A[1] - P[1]) * (B[0] - P[0]) )
@@ -25,12 +26,6 @@ def centerAim(image):
     image_Aim = cv2.line(image, line_horizontal_start, line_horizontal_end, (255, 0, 0), 3)
     image_Aim = cv2.line(image, line_vertical_height, line_vertical_width, (255, 0, 0), 3)
     return image_Aim
-
-def motor(distance):
-    if distance < 0 :
-        print("left motor up")
-    else :
-        print("right motor up")
 
 def LaneDetectImg(imagePath):
     #image = cv2.imread(imagePath) 
@@ -77,15 +72,27 @@ def LaneDetectImg(imagePath):
         #midLinePoint = centerLinePts_point(lines, cpt)
     
         ptLen = dist(cpt, centerPt_min, centerPt_max)
+        
+        # try:
+        #     distance = distSign(cpt, centerPt_min, centerPt_max, ptLen)
+        #     print("distance")
+        #     print(distance)
+            
+        #     print("motor OK")
+        #     motorDef.motor_run(distance)
+        #     print("motor OK")
+        # except:
+        #     motorDef.all_stop()
+
         distance = distSign(cpt, centerPt_min, centerPt_max, ptLen)
         print("distance")
         print(distance)
-        
-        #motor
-        
+
+        if motorDef.motor_run(distance) == -1:
+            print("distance is none")
+        print("motor OK")
     
     image_lane = centerAim(image_lane)
-    
     
     #'''
     #''' #canny_edge
@@ -113,7 +120,7 @@ def LaneDetectImg_canny(imagePath):
 
     roi_corners = np.array([[pt1, pt2, pt3, pt4]], dtype=np.int32)
     
-    A
+    
     image_roi = polyROI(image_edge, roi_corners)
     #imageShow("image_roi", image_roi) #cannyedge check
     

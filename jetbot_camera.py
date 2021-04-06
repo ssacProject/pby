@@ -7,7 +7,8 @@ import numpy as np
 import lane_detection
 import time
 from OpenCV_Functions import *
- 
+import motorDef
+
 def Video(openpath):
     cap = cv2.VideoCapture(openpath)
     time.sleep(2)
@@ -35,7 +36,7 @@ def Video(openpath):
             #linecv = cv2.line(frame, line_horizontal_start, line_horizontal_end, (255,0,0),3)
             #lane_detect = hough(frame)
             #cv2.imshow("input", lane_detect)
-#            lane_detect = lane_detection.LaneDetectImg(frame)
+            lane_detect = lane_detection.LaneDetectImg(frame)
                 #lane_detect = lane_detection.hough(frame)
             #cv2.imshow("input", lane_detect)
             
@@ -59,7 +60,7 @@ def Video(openpath):
             break
         # waitKey(int(1000.0/fps)) for matching fps of video
         if cv2.waitKey(int(1000.0/fps)) & 0xFF == ord('q'):
-            #motor_stop()
+            motorDef.all_stop() #motor stop
             break
     # When everything done, release the capture
     cap.release()
@@ -68,4 +69,5 @@ def Video(openpath):
     return
    
 if __name__=="__main__":
+    #motorDef.motor_init()
     Video(gst_str)

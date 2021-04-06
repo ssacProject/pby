@@ -483,11 +483,9 @@ def centerLinePts(lines, cpt, slope_threshold = (5. * np.pi / 180.)):
 
     lefts.append(all_lines[inter_list.index(min(inter_list))])
     rights.append(all_lines[inter_list.index(max(inter_list))])
-    print("lefts", lefts)
-    print("rights", rights)
+    #print("lefts", lefts)
+    #print("rights", rights)
 
-            
-    print("\n\n")
     if lefts is not None:
         if lefts[0][2] > lefts[0][4]:
             lefts[0][1], lefts[0][2], lefts[0][3], lefts[0][4] = lefts[0][3], lefts[0][4], lefts[0][1], lefts[0][2]
@@ -581,15 +579,13 @@ def centerLineFitting(image, lines, color = (0,0,255), thickness = 3, slope_thre
     result = imageCopy(image)
     height = image.shape[0]
     #lefts, rights = splitTwoSideLines(lines, slope_threshold)
-    print("cpt up")
+
     cpt = cptF(image)
-    print("cpt down")
+
     centers = centerLinePts(lines, cpt, slope_threshold)
-    print("111")
     #print(lefts)
     #print(rights)
     center = medianPoint(centers) 
-    print("222")
     #left = medianPoint(lefts)
     #right = medianPoint(rights)
     min_y = int(height*0.6)
