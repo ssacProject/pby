@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import lane_detection
 import time
-from OpenCV_Functions import *
+from OpenCV_Utils import *
 import motorDef
 
 def Video(openpath):
@@ -18,7 +18,8 @@ def Video(openpath):
         print("Video Not Opened")
         print("Program Abort")
         exit()
-    fps = cap.get(cv2.CAP_PROP_FPS)
+    fps = 60    
+   # fps = cap.get(cv2.CAP_PROP_FPS)
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fourcc = int(cap.get(cv2.CAP_PROP_FOURCC))
@@ -31,14 +32,7 @@ def Video(openpath):
         ret, frame = cap.read()
         #frame = cv2.resize(frame, dsize=(224, 224), interpolation=cv2.INTER_AREA)
         if ret:
-            #height, width = frame.shape[:2]
-            #line_horizontal_start, line_horizontal_end = (int(width* 0.45), int(height*0.6)), (int(width * 0.55), int(height * 0.6))
-            #linecv = cv2.line(frame, line_horizontal_start, line_horizontal_end, (255,0,0),3)
-            #lane_detect = hough(frame)
-            #cv2.imshow("input", lane_detect)
 #            lane_detect = lane_detection.LaneDetectImg(frame)
-                #lane_detect = lane_detection.hough(frame)
-            #cv2.imshow("input", lane_detect)
             
             try:
                 #canny

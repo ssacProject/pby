@@ -91,7 +91,6 @@ def drawHoughLinesP(image, lines):
             cv2.line(result, (x1, y1), (x2, y2), (0, 0, 255), 3)
     return result
 ####################################################
-# x1-x2  
 
 
 def medianPoint(x):
@@ -215,7 +214,6 @@ def centerLinePts(lines, cpt):
     else:
         cSlope = (float)(cy2-cy1)/(float)(cx2-cx1)
         centers.append([cSlope, cx1, cy1, cx2, cy2])
-    print("centers finish")
     return centers
 
 def centerPoints(image, lines, color = (0,0,255), thickness = 3):
@@ -227,7 +225,6 @@ def centerPoints(image, lines, color = (0,0,255), thickness = 3):
     #lefts, rights = splitTwoSideLines(lines, slope_threshold)
     
     centers = centerLinePts_point(lines, cpt)
-    print("centers", centers)   
     if centers == 1:
         return 1  
     #print(lefts)
@@ -311,3 +308,28 @@ def centerLinePts_point(lines, cpt):
         cSlope = (float)(cy2-cy1)/(float)(cx2-cx1)
         centers.append([cSlope, cx1, cy1, cx2, cy2])
     return centers
+
+def dist(P, A, B):
+    area = abs ( (A[0] - P[0]) * (B[1] - P[1]) - (A[1] - P[1]) * (B[0] - P[0]) )
+    AB = ( (A[0] - B[0]) ** 2 + (A[1] - B[1]) ** 2 ) ** 0.5
+    return ( area / AB )
+
+def distSign(cpt, center_min, center_max, ptLen):
+    #print(type(lines), type(A), type(B), type(ptLen))
+    interpolate_x = interpolate(center_min[0], center_min[1], center_max[0], center_max[1], cpt[1])
+
+    if interpolate_x < cpt[0]:
+        ptLen = -ptLen
+
+    return ptLen
+
+def centerAim(image):
+    height, width = image.shape[:2]
+    line_horizontal_start = ( int(width * 0.45), int(height *0.6))
+    line_horizontal_end = (int(width * 0.55), int(height *0.6))
+    line_vertical_height = ( int(width * 0.5), int(height *0.55))
+    line_vertical_width = (int(width * 0.5), int(height *0.65))
+
+    image_Aim = cv2.line(image, line_horizontal_start, line_horizontal_end, (255, 0, 0), 3)
+    image_Aim = cv2.line(image, line_vertical_height, line_vertical_width, (255, 0, 0), 3)
+    return image_Aim

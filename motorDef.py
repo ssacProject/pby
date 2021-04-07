@@ -29,26 +29,26 @@ def set_speed(motor_ID, value):
 
 # stops all motors
 def all_stop():
-	motor_left.setSpeed(0)
-	motor_right.setSpeed(0)
+    motor_left.setSpeed(0)
+    motor_right.setSpeed(0)
 
-	motor_left.run(Adafruit_MotorHAT.RELEASE)
-	motor_right.run(Adafruit_MotorHAT.RELEASE)
+    motor_left.run(Adafruit_MotorHAT.RELEASE)
+    motor_right.run(Adafruit_MotorHAT.RELEASE)
  
  # go front
-def motor_start():
-    set_speed(motor_left_ID, 0.2)
-    set_speed(motor_right_ID, 0.2)
+def motor_start(left_value, right_value):
+    set_speed(motor_left_ID, left_value)
+    set_speed(motor_right_ID, right_value)
     
 # go left
-def motor_left_direction():
-    set_speed(motor_left_ID, 0.2)
-    set_speed(motor_right_ID, 0.25)
+def motor_left_direction(left_value, right_value):
+    set_speed(motor_left_ID, left_value)
+    set_speed(motor_right_ID, right_value)
     
 # go right
-def motor_right_direction():
-    set_speed(motor_left_ID, 0.25)
-    set_speed(motor_right_ID, 0.2)
+def motor_right_direction(left_value, right_value):
+    set_speed(motor_left_ID, left_value)
+    set_speed(motor_right_ID, right_value)
     
 # motor init    
 
@@ -63,28 +63,33 @@ motor_right = motor_driver.getMotor(motor_right_ID)
 set_speed(motor_left_ID,   0.0)
 set_speed(motor_right_ID,  0.0)
 
-time.sleep(0.1)
+#time.sleep(0.1)
+
 
 #set_speed(motor_left_ID, 0.0)
 #set_speed(motor_right_ID, 0.0)
 
-left = 0.0
-right = 0.0
-
 def motor_run(distance):
+    dist_range = 25
     if distance is None:
         print("distance is None")
         return -1
 
-    if 25 >= abs(distance) > 0:
-        motor_start()
-        print("front !!")
-    elif distance < -25 :
-        motor_left_direction()
-        print("right !!")
-    elif distance > 25 :
-        motor_right_direction()
-        print("left !!")
+    if dist_range >= abs(distance) :#25
+        motor_start(0.2, 0.2)
+        print("go front !!")
+    elif -80 < distance < -dist_range :
+        motor_left_direction(0.2, 0.23) # 0.2 0.25 left wheel
+        print("go left1 !!")
+    elif 80 > distance > dist_range :
+        motor_right_direction(0.24, 0.2) # 0.26, 0.2 right wheel
+        print("go right1 !!")
+    elif distance <= -80 :
+        motor_left_direction(0.2, 0.3)
+        print("go left2 !!")
+    elif distance >= 80 :
+        motor_right_direction(0.3, 0.2)
+        print("go right2 !!")
     else :
         all_stop()
         print("distance is None")
