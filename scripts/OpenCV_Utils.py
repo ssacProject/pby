@@ -93,7 +93,6 @@ def drawHoughLinesP(image, lines):
     return result
 ####################################################
 
-
 def medianPoint(x):
     if len(x) == 0:
         return None
@@ -101,15 +100,14 @@ def medianPoint(x):
         xx = sorted(x)
         return xx[(int)(len(xx)/2)]
 
-
+# 선형 보간법
 def interpolate(x1, y1, x2, y2, y):
     return int(float(y - y1) * float(x2-x1) / float(y2-y1) + x1)
 
-#center line 
+# draw center red line 
 def centerLineFitting(image, lines, color = (0,0,255), thickness = 3):
     result = imageCopy(image)
     height = image.shape[0]
-    #lefts, rights = splitTwoSideLines(lines, slope_threshold)
 
     cpt = cptF(image)
 
@@ -138,14 +136,14 @@ def cptF(image):
     cpt = (int(width*0.5), int(height*0.4))
     return cpt
 
+# 
 def centerLinePts(lines, cpt):
     lefts = []
     rights = []
     centers = []
     all_lines = []
     n = 0
-    #print("lines\n", lines)
-    #cpt (width, height)
+
     if lines is None:
         print("lines is None\n")
         return 1
@@ -228,6 +226,7 @@ def centerPoints(image, lines, color = (0,0,255), thickness = 3):
  
     return ctp
 
+# 중앙 선의 두점을 return
 def centerLinePts_point(lines, cpt):
     lefts = []
     rights = []
@@ -290,19 +289,22 @@ def centerLinePts_point(lines, cpt):
         centers.append([cSlope, cx1, cy1, cx2, cy2])
     return centers
 
+# 직선과 점 사이의 거리
 def dist(P, A, B):
     area = abs ( (A[0] - P[0]) * (B[1] - P[1]) - (A[1] - P[1]) * (B[0] - P[0]) )
     AB = ( (A[0] - B[0]) ** 2 + (A[1] - B[1]) ** 2 ) ** 0.5
     return ( area / AB )
 
+# 중앙점으로 부터 왼쪽이면 - 오른쪽이면 +
 def distSign(cpt, center_min, center_max, ptLen):
     interpolate_x = interpolate(center_min[0], center_min[1], center_max[0], center_max[1], cpt[1])
-
+    
     if interpolate_x < cpt[0]:
         ptLen = -ptLen
 
     return ptLen
 
+# 중앙 십자 초점
 def centerAim(image):
     height, width = image.shape[:2]
     line_horizontal_start = ( int(width * 0.45), int(height *0.4))
