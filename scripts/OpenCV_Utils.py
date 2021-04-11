@@ -118,14 +118,11 @@ def centerLineFitting(image, lines, color = (0,0,255), thickness = 3):
     except:
         print("centers", centers)
     
-    #print(lefts)
-    #print(rights)
     if centers is None:
         print("centers is None")
         return 1 
     center = medianPoint(centers) 
-    #left = medianPoint(lefts)
-    #right = medianPoint(rights)
+
     min_y = int(height*0.4)
     max_y = height
 
@@ -133,15 +130,7 @@ def centerLineFitting(image, lines, color = (0,0,255), thickness = 3):
         min_x_center = interpolate(center[1], center[2], center[3], center[4], min_y)
         max_x_center = interpolate(center[1], center[2], center[3], center[4], max_y)
         cv2.line(result, (min_x_center, min_y), (max_x_center, max_y), color, thickness)
-    # if left is not None:
-    #     min_x_left = interpolate(left[1], left[2], left[3], left[4], min_y)
-    #     max_x_left = interpolate(left[1], left[2], left[3], left[4], max_y)
-    #     cv2.line(result, (min_x_left, min_y), (max_x_left, max_y), color, thickness)
-    # if right is not None:
-    #     min_x_right = interpolate(right[1], right[2], right[3], right[4], min_y)
-    #     max_x_right = interpolate(right[1], right[2], right[3], right[4], max_y)
-    #     cv2.line(result, (min_x_right, min_y), (max_x_right, max_y), color, thickness)
-    #print("centerLineFitting finish")
+
     return result
 
 def cptF(image):
@@ -167,36 +156,26 @@ def centerLinePts(lines, cpt):
         y2 = line[0,3]
         if (x2-x1) == 0:
             x2 = x2 + 1
-        #   continue
-        #if (y2-y1) == 0:
-        #    y2 = y2 + 1
+
         slope_degree = (math.atan2(float(y2-y1), float(x2-x1)) * 180) / math.pi
-        #print("pi", math.pi)
-        #print("atan", slope_degree)
-        # slope = (float)(y2-y1)/(float)(x2-x1)
+        
         if abs(slope_degree) > 150.0 or abs(slope_degree) < 30.0:
             #print("slope_degree", n+1)
             continue
 
         all_lines.append([slope_degree, x1, y1, x2, y2])
-        #print("all_lines", all_lines)    
-    #print("lines number :", len(all_lines))
-        #print("slope_degree", all_lines[0][0])
+
     inter_list = []
     count = 0
     for i in all_lines:
-        #print("forfor I", i)
-        #print("cpt(1)", cpt[0], all_lines[0][0])
+
         inter_x = interpolate(all_lines[count][1], all_lines[count][2], all_lines[count][3], all_lines[count][4], cpt[1])
         count = count + 1
-        #print("inter_x",inter_x)
+
         inter_list.append(inter_x)
-        #print("inter_list", inter_list)
 
     lefts.append(all_lines[inter_list.index(min(inter_list))])
     rights.append(all_lines[inter_list.index(max(inter_list))])
-    #print("lefts", lefts)
-    #print("rights", rights)
 
     if lefts is not None:
         if lefts[0][2] > lefts[0][4]:
@@ -209,9 +188,6 @@ def centerLinePts(lines, cpt):
             rights[0][1], rights[0][2], rights[0][3], rights[0][4] = rights[0][3], rights[0][4], rights[0][1], rights[0][2]
     else:
         print("rights is None\n\n\n\n")
-        
-    #print("lefts\n", lefts)
-    #print("rights\n", rights)
 
     cx1 = (lefts[0][1] + rights[0][1]) / 2
     cy1 = (lefts[0][2] + rights[0][2]) / 2
@@ -231,16 +207,12 @@ def centerPoints(image, lines, color = (0,0,255), thickness = 3):
     ctp = []            # point of center Red Line
     cpt = cptF(image)  # point of aim
     
-    #lefts, rights = splitTwoSideLines(lines, slope_threshold)
-    
     centers = centerLinePts_point(lines, cpt) # center Point2 return
     if centers == 1:
         return 1  
-    #print(lefts)
-    #print(rights)
+
     center = medianPoint(centers) 
-    #left = medianPoint(lefts)
-    #right = medianPoint(rights)
+
     min_y = int(height*0.6)
     max_y = height
 
@@ -261,7 +233,7 @@ def centerLinePts_point(lines, cpt):
     rights = []
     centers = []
     all_lines = []
-    #cpt (width, height)
+
     if lines is None:
         print("lines is None\n")
         return 1 
@@ -272,28 +244,24 @@ def centerLinePts_point(lines, cpt):
         y2 = line[0,3]
         if (x2-x1) == 0:
             x2 = x2 + 1
-        #   continue
-        #if (y2-y1) == 0:
-        #    y2 = y2 + 1
+
         slope = (float)(y2-y1)/(float)(x2-x1)
         
         slope_degree = (math.atan2(float(y2-y1), float(x2-x1)) * 180) / math.pi
-        # slope = (float)(y2-y1)/(float)(x2-x1)
+
         if abs(slope_degree) > 150.0 or abs(slope_degree) < 30.0:
             print("slope_degree", n+1)
             continue
 
         all_lines.append([0, x1, y1, x2, y2])
-        #print("all_lines", all_lines)    
         
     inter_list = []
     count = 0
     for i in all_lines:
         inter_x = interpolate(all_lines[count][1], all_lines[count][2], all_lines[count][3], all_lines[count][4], cpt[1])
         count = count + 1
-        #print("inter_x",inter_x)
+
         inter_list.append(inter_x)
-        #print("inter_list", inter_list)
 
     lefts.append(all_lines[inter_list.index(min(inter_list))])
     rights.append(all_lines[inter_list.index(max(inter_list))])
@@ -328,7 +296,6 @@ def dist(P, A, B):
     return ( area / AB )
 
 def distSign(cpt, center_min, center_max, ptLen):
-    #print(type(lines), type(A), type(B), type(ptLen))
     interpolate_x = interpolate(center_min[0], center_min[1], center_max[0], center_max[1], cpt[1])
 
     if interpolate_x < cpt[0]:
